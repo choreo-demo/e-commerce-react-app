@@ -1,0 +1,7 @@
+{
+    "clientID": "sh8DC7lSPVz9bQumlmmaIkqnfcsa",
+    "baseUrl": "https://api.asgardeo.io/t/ramindu",
+    "signInRedirectURL": "http://localhost:3000",
+    "signOutRedirectURL": "http://localhost:3000",
+    "scope": ["openid","profile"]
+}

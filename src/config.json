@@ -1,7 +1,9 @@
 {
-    "clientID": "sh8DC7lSPVz9bQumlmmaIkqnfcsa",
-    "baseUrl": "https://api.asgardeo.io/t/ramindu",
+    "clientID": "B0939_1qmylY2L009fn4Y8boyiIa",
+    "baseUrl": "https://api.asgardeo.io/t/hackathonnew",
     "signInRedirectURL": "http://localhost:3000",
     "signOutRedirectURL": "http://localhost:3000",
-    "scope": ["openid","profile"]
+    "scope": ["openid","profile", "groups"],
+    "tokenEndpoint": "https://api.asgardeo.io/t/hackathonnew/oauth2/token",
+    "authEndpoint" : "https://api.asgardeo.io/t/hackathonnew/oauth2/authorize"
 }

@@ -160,7 +160,7 @@ export default function Admin() {
                                     <td contenteditable='true'></td>
                                     <td contenteditable='true'></td>
                                     <td contenteditable='true'></td>
-                                    <td colSpan="8"><Button variant="primary" className="float-right" onClick={() => addNewCartItem(item)}>Add New Product</Button></td>
+                                    <td colSpan="8"><Button variant="primary" className="float-right" onClick={() => addNewCartItem(numberOfItems)}>Add New Product</Button></td>
                                 </tr>
                             </thead>
                         </Table>

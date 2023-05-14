@@ -1,20 +1,21 @@
 import React, { useEffect } from 'react';
-import { Container, Row, Col, Form, FormLabel, Button } from 'react-bootstrap';
+import { Button, Col, Container, Form, FormLabel, Row } from 'react-bootstrap';
+import { InputNumber, InputGroup } from 'rsuite';
 import '../../App.js';
 import '../../index.css';
-import { InputNumber, InputGroup } from 'rsuite';
-import './inputnumber.less'
 import { useCartContext } from '../context/context';
+import './inputnumber.less';
 
 export default function MyCart() {
 
-    const {cart} = useCartContext();
+    const { cart, uptateItemQty } = useCartContext();
     useEffect(() => {
         document.title = 'My Cart';
     }, []);
 
     // State to keep track of the number of items in the cart
-    const [value, setValue] = React.useState(0);
+    const [value, setValue] = React.useState(1);
+    const [subTotal, setSubTotal] = React.useState(0);
     const handleMinus = () => {
         setValue(parseInt(value, 10) - 1);
     };
@@ -22,8 +23,69 @@ export default function MyCart() {
         setValue(parseInt(value, 10) + 1);
     };
 
+
+    const rows = cart.map(cartItem => {
+        
+        const handleQtyIncrease = () => {
+            uptateItemQty({
+                id: cartItem.ID,
+                qty: cartItem.qty + 1
+            })
+            setValue(parseInt(value, 10) + 1);
+            const total = cartItem.Price * cartItem.qty
+            setSubTotal(subTotal + total)
+        }
+    
+        const handleQtyChange = (e) => {
+            if (e <= 0) {
+                e = 1      
+            }
+            uptateItemQty({
+                id: cartItem.ID,
+                qty: e
+            })
+            const total = cartItem.Price * cartItem.qty
+            setSubTotal(subTotal + total)
+        }
+
+        const handleQtyDecrease = () => {
+            if (cartItem.qty === 1) {
+                uptateItemQty({
+                    id: cartItem.ID,
+                    qty: cartItem.qty
+                })
+
+            } else {
+                uptateItemQty({
+                    id: cartItem.ID,
+                    qty: cartItem.qty - 1
+                })
+            }
+            const total = cartItem.Price * cartItem.qty
+            setSubTotal(subTotal + total)
+        }
+    
+        return (
+            <tr key={cartItem.ID}>
+                <td>{cartItem.Title}</td>
+                <td width="120px">
+                    <InputGroup>
+                        <InputGroup.Button onClick={handleQtyDecrease} >-</InputGroup.Button>
+                        <InputNumber className={'custom-input-number'} min={1} value={cartItem.qty} onChange={handleQtyChange} />
+                        <InputGroup.Button onClick={handleQtyIncrease}>+</InputGroup.Button>
+                    </InputGroup>
+                </td>
+                <td width="120px" className="text-center">{cartItem.Price}</td>
+                <td width="120px" className="text-center">{`$ ${cartItem.Price * cartItem.qty}`}</td>
+                {console.log(cartItem)}
+            </tr>
+        )
+    })
+
+
     // Number of items in the cart
-    let numItems = 6;
+    let numItems = cart.reduce((acc, curr) => acc + curr.qty, 0);
+    let cartPrice = cart.reduce((acc, curr) => acc + curr.qty * curr.Price, 0);
     return (
         <>
             <Container className="mt-5">
@@ -40,28 +102,7 @@ export default function MyCart() {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>Top Paw® Valentine's Day Single Dog Sweater</td>
-                                    <td width="120px"><InputGroup>
-                                        <InputGroup.Button onClick={handleMinus}>-</InputGroup.Button>
-                                        <InputNumber className="custom-input-number" value={3} onChange={setValue} />
-                                        <InputGroup.Button onClick={handlePlus}>+</InputGroup.Button>
-                                    </InputGroup></td>
-                                    <td width="120px" className="text-center">$ 14.99</td>
-                                    <td width="120px" className="text-center">$ 44.97</td>
-                                </tr>
-
-                                <tr>
-                                    <td>Arcadia Trail™ Dog Windbreaker</td>
-                                    <td width="120px"><InputGroup>
-                                        <InputGroup.Button onClick={handleMinus}>-</InputGroup.Button>
-                                        <InputNumber className="custom-input-number" value={3} onChange={setValue} />
-                                        <InputGroup.Button onClick={handlePlus}>+</InputGroup.Button>
-                                    </InputGroup></td>
-                                    <td width="120px" className="text-center">$ 29.99</td>
-                                    <td width="120px" className="text-center">$ 89.97</td>
-                                </tr>
-
+                                {rows}                        
                             </tbody>
                         </table>
                     </Col>
@@ -88,22 +129,23 @@ export default function MyCart() {
                                         <Form.Control type="text" placeholder="CVV" />
                                     </Form.Group></Col>
                             </Row>
-                            <Row className="p-2">
+                            <Row className="p-1">
                                 <Col>Subtotal</Col>
-                                <Col className="col-2 d-flex justify-content-right">$134.97</Col>
+                                <Col className="col-2 d-flex justify-content-right">{`$ ${(cartPrice).toFixed(2)}`}</Col>
                             </Row>
-                            <Row className="p-2">
+                            <Row className="p-1">
                                 <Col>Shipping</Col>
-                                <Col className="col-2 d-flex justify-content-right">$20</Col>
+                                <Col className="col-2 d-flex justify-content-right">{`$ ${(cartPrice * 1/100).toFixed(2)}`}</Col>
                             </Row>
-                            <Row className="p-2">
+                            <Row className="p-1">
                                 <Col c>Tax</Col>
-                                <Col className="col-2 d-flex justify-content-right">$10.34</Col>
+                                <Col className="col-2 d-flex justify-content-right">{`$ ${(cartPrice* 10/100).toFixed(2)}`}</Col>
                             </Row>
 
-                            <Row className="p-2">
+                            <Row className="p-1">
                                 <Col>Total (inc. tax)</Col>
-                                <Col className="col-2 d-flex justify-content-right">$165.31</Col>
+                                <Col className="col-2 d-flex justify-content-right">
+                                    {`$ ${(cartPrice + cartPrice* 10/100 + cartPrice * 1/100).toFixed(2)}`}</Col>
                             </Row>
                             <Row className="d-flex justify-content-center p-3">
                                 <Button variant="warning" type="submit" size="lg">

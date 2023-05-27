@@ -71,7 +71,7 @@ export default function MyCart() {
                 <td width="120px">
                     <InputGroup>
                         <InputGroup.Button onClick={handleQtyDecrease} >-</InputGroup.Button>
-                        <InputNumber className={'custom-input-number'} min={1} value={cartItem.qty} onChange={handleQtyChange} />
+                        <input type='number'  className={'custom-input-number'} value={cartItem.qty} onChange={handleQtyChange}/>
                         <InputGroup.Button onClick={handleQtyIncrease}>+</InputGroup.Button>
                     </InputGroup>
                 </td>

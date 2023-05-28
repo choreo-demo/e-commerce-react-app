@@ -8,8 +8,7 @@ import { AuthProvider, useAuthContext } from "@asgardeo/auth-react";
 import { useCartContext } from '../context/context';
 // import PetStoreNav from '../../App.js';
 import axios, { isCancel, AxiosError } from 'axios';
-
-
+import { default as authConfig } from "../../config.json";
 
 console.log("Catelog.js rendered");
 
@@ -36,16 +35,17 @@ const PetItemList = () => {
   const [token, settoken] = useState([]);
   const [catalog, setCatalog] = useState([]); 
   const [cart, setCartItem] = useState([]);  
+  const gatewayURL = authConfig.endpointURL;
 
   useEffect(() => {
     if (state.isAuthenticated) {
       getAccessToken().then((accessToken) => {
         console.log("token " + accessToken);
         settoken(accessToken);
-        const url = 'https://a08ea0cf-47a1-4195-baf2-48335f9914fc-dev.e1-us-east-azure.choreoapis.dev/ezbg/ecommerceapp/1.0.0/items';
+        const url = gatewayURL + '/items';
         const headers = {
           'Authorization': 'Bearer ' + accessToken,
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         };
         const fetchCatalogs = async () => {
           const result = await axios.get(url, { headers });

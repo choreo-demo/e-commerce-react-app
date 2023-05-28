@@ -24,7 +24,7 @@ export default function Admin() {
         httpRequest
     } = useAuthContext();
     var catalogUpdated = false;
-    const gatewayURL = authConfig.clientID;
+    const gatewayURL = authConfig.endpointURL;
     useEffect(() => {
         document.title = "Admin | PetStore";
     }, []);
@@ -79,7 +79,9 @@ export default function Admin() {
     };
 
     const deleteCartItem = (id) => {
-        const payload = {id: id};
+        const payload = {id: parseInt(id)};
+        console.log("in item deletion: " + payload);
+        console.log(payload);
         getAccessToken().then((accessToken) => {
             console.log("token " + accessToken);
             settoken(accessToken);
@@ -87,18 +89,17 @@ export default function Admin() {
             const headers = {
                 'Authorization': 'Bearer ' + accessToken,
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*',
+                // 'Access-Control-Allow-Origin': '*'
             };
             const addToCatalog = async () => {
                 const result = await axios.delete(url, payload, { headers });
                 catalogUpdated = false;
-                console.log("Catalog item deleted")
+                console.log("Catalog updated")
                 console.log(result.data)
                 console.log(catalogUpdated);
-                return result.data; //add popup
+                return result.data;
             };
             addToCatalog();
-            
         }).catch((error) => {
             console.log(error);
         });
@@ -114,10 +115,8 @@ export default function Admin() {
         const color = document.getElementById("newcoler").innerHTML;
         const material = document.getElementById("newmaterial").innerHTML;
         const price = parseFloat(document.getElementById("newprice").innerHTML);
-
         const payload = {id: id, title: title, description: description, includes: includes, intendedFor: irntendedFor, color: color, material: material, price: price};
         console.log(payload);
-        
         getAccessToken().then((accessToken) => {
             console.log("token " + accessToken);
             settoken(accessToken);
@@ -125,7 +124,7 @@ export default function Admin() {
             const headers = {
                 'Authorization': 'Bearer ' + accessToken,
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*',
+                // 'Access-Control-Allow-Origin': '*'
             };
             const addToCatalog = async () => {
                 const result = await axios.post(url, payload, { headers });
@@ -183,7 +182,7 @@ export default function Admin() {
                                         <td>{cat.Price}</td>
                                         <td>
                                             <Button variant="warning" size="sm" onClick={() => editCartItem(cat.ID)}>Edit</Button>
-                                            <Button variant="danger" size="sm" onClick={() => editCartItem(cat.ID)}>Remove</Button>    
+                                            <Button variant="danger" size="sm" onClick={() => deleteCartItem(cat.ID)}>Remove</Button>    
                                         </td>
                                     </tr>
                                 ))}

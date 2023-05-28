@@ -63,7 +63,7 @@ const PetItemList = () => {
     }
   }, [state.isAuthenticated]);
 
-
+  
   if (state.isAuthenticated) {
     return (
       <>
@@ -91,7 +91,7 @@ const PetItemList = () => {
                   <td>{cat.Color}</td>
                   <td>{cat.Material}</td>
                   <td>{cat.Price}</td>
-                  <td><Button variant="danger" size="sm" onClick={() => setCartItem(cat.ID)}>Add to cart</Button></td>
+                  <td><Button variant="danger" size="sm" onClick={() => addToCart(cat)}>Add to cart</Button></td>
                 </tr>
               ))}
               {/* <tr className="text-end">

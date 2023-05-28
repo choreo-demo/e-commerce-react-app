@@ -1,9 +1,10 @@
 {
-    "clientID": "B0939_1qmylY2L009fn4Y8boyiIa",
-    "baseUrl": "https://api.asgardeo.io/t/hackathonnew",
+    "clientID": "ticXVL0LHu6PuHg40hlrGfI_SJIa",
+    "baseUrl": "https://api.asgardeo.io/t/raminduorg",
     "signInRedirectURL": "http://localhost:3000",
     "signOutRedirectURL": "http://localhost:3000",
     "scope": ["openid","profile", "groups"],
-    "tokenEndpoint": "https://api.asgardeo.io/t/hackathonnew/oauth2/token",
-    "authEndpoint" : "https://api.asgardeo.io/t/hackathonnew/oauth2/authorize"
+    "tokenEndpoint": "https://api.asgardeo.io/t/raminduorg/oauth2/token",
+    "authEndpoint" : "https://api.asgardeo.io/t/raminduorg/oauth2/authorize",
+    "endpointURL": "https://15a802cd-69eb-4e0f-b57c-33ec61ab2e90-prod.e1-us-east-azure.choreoapis.dev/ynpw/ecomdbservice/rest-27c/1.0.0"
 }

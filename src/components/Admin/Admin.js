@@ -3,6 +3,7 @@ import { Container, Button, Table } from 'react-bootstrap';
 import { useState } from 'react';
 import { useAuthContext } from "@asgardeo/auth-react";
 import { manualSignIn, manualGetToken } from '../Authenticator/Auth.js';
+import { default as authConfig } from "../../config.json";
 const axios = require('axios');
 
 export default function Admin() {
@@ -22,7 +23,8 @@ export default function Admin() {
         getAccessToken,
         httpRequest
     } = useAuthContext();
-
+    var catalogUpdated = false;
+    const gatewayURL = authConfig.clientID;
     useEffect(() => {
         document.title = "Admin | PetStore";
     }, []);
@@ -31,6 +33,7 @@ export default function Admin() {
     console.log(state);
 
     useEffect(() => {
+        console.log("catelogsUpdated - " + catalogUpdated )
         getBasicUserInfo().then((basicUserDetails) => {
             console.log("Userinfo : " + JSON.stringify(basicUserDetails));
             console.log("Userinfo groups: " + basicUserDetails.groups);
@@ -41,7 +44,7 @@ export default function Admin() {
                 getAccessToken().then((accessToken) => {
                     console.log("token " + accessToken);
                     settoken(accessToken);
-                    const url = 'https://a08ea0cf-47a1-4195-baf2-48335f9914fc-dev.e1-us-east-azure.choreoapis.dev/ezbg/ecommerceapp/1.0.0/items';
+                    const url = gatewayURL + '/items';
                     const headers = {
                         'Authorization': 'Bearer ' + accessToken,
                         'Content-Type': 'application/json',
@@ -59,32 +62,13 @@ export default function Admin() {
                 }).catch((error) => {
                     console.log(error);
                 });
-                // const url = 'http://localhost:9091/rest/items';
-                // const config = {
-                //     method: 'get',
-                //     url: url,
-                //     withCredentials: false,
-                //     mode: 'no-cors',
-                //     headers: {
-                //         // 'Access-Control-Allow-Origin': '*',
-                //         'Content-Type': 'application/json',
-                //         'Accept': 'application/json'
-                //     }
-                // };
-                // axios(config)
-                //     .then(response => {
-                //         console.log(response);
-                //     })
-                //     .catch(error => {
-                //         console.log(error);
-                //     });
-            } else {
-                
-            }
+          } else {
+            
+        }
         }).catch((error) => {
             // Handle the error
         })
-    }, [state.isAuthenticated]);
+    }, [state.isAuthenticated, catalogUpdated]);
 
     const handleRowClick = (row) => {
         setSelectedRow(row);
@@ -94,25 +78,75 @@ export default function Admin() {
         
     };
 
-    const addNewCartItem = (id) => {
+    const deleteCartItem = (id) => {
+        const payload = {id: id};
         getAccessToken().then((accessToken) => {
             console.log("token " + accessToken);
             settoken(accessToken);
-            const url = 'https://a08ea0cf-47a1-4195-baf2-48335f9914fc-dev.e1-us-east-azure.choreoapis.dev/ezbg/ecommerceapp/1.0.0/items';
+            const url = gatewayURL + '/item';
             const headers = {
                 'Authorization': 'Bearer ' + accessToken,
                 'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
             };
-            const fetchCatalogs = async () => {
-                const result = await axios.get(url, { headers });
+            const addToCatalog = async () => {
+                const result = await axios.delete(url, payload, { headers });
+                catalogUpdated = false;
+                console.log("Catalog item deleted")
+                console.log(result.data)
+                console.log(catalogUpdated);
+                return result.data; //add popup
+            };
+            addToCatalog();
+            
+        }).catch((error) => {
+            console.log(error);
+        });
+    };
+
+    const addNewCartItem = (newid) => {
+        console.log(newid);
+        const id = -1;
+        const title = document.getElementById("newtitle").innerHTML;
+        const description = document.getElementById("newdescription").innerHTML;
+        const includes = document.getElementById("newincludes").innerHTML;
+        const irntendedFor = document.getElementById("newintendedFor").innerHTML;
+        const color = document.getElementById("newcoler").innerHTML;
+        const material = document.getElementById("newmaterial").innerHTML;
+        const price = parseFloat(document.getElementById("newprice").innerHTML);
+
+        const payload = {id: id, title: title, description: description, includes: includes, intendedFor: irntendedFor, color: color, material: material, price: price};
+        console.log(payload);
+        
+        getAccessToken().then((accessToken) => {
+            console.log("token " + accessToken);
+            settoken(accessToken);
+            const url = gatewayURL + '/item';
+            const headers = {
+                'Authorization': 'Bearer ' + accessToken,
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+            };
+            const addToCatalog = async () => {
+                const result = await axios.post(url, payload, { headers });
+                catalogUpdated = false;
+                console.log("Catalog updated")
+                console.log(result.data)
+                console.log(catalogUpdated);
                 return result.data;
             };
-            const fetchData = async () => {
-                const catData = await fetchCatalogs();
-                console.log(catData);
-                setCatalog(catData);
-            };
-            fetchData();
+            addToCatalog();
+
+            // const fetchCatalogs = async () => {
+            //     const result = await axios.post(url, payload, { headers });
+            //     return result.data;
+            // };
+            // const fetchData = async () => {
+            //     const catData = await fetchCatalogs();
+            //     console.log(catData);
+            //     setCatalog(catData);
+            // };
+            
         }).catch((error) => {
             console.log(error);
         });
@@ -140,7 +174,6 @@ export default function Admin() {
                                 </tr>
                                 {catalog.map(cat => (
                                     <tr className="align-middle" key={cat.ID} row={cat.ID} onClick={handleRowClick}>
-                                        <td>{cat.ID}</td>
                                         <td>{cat.Title}</td>
                                         <td>{cat.Description}</td>
                                         <td>{cat.Includes}</td>
@@ -148,19 +181,21 @@ export default function Admin() {
                                         <td>{cat.Color}</td>
                                         <td>{cat.Material}</td>
                                         <td>{cat.Price}</td>
-                                        <td><Button variant="danger" size="sm" onClick={() => editCartItem(cat.ID)}>Edit</Button></td>
+                                        <td>
+                                            <Button variant="warning" size="sm" onClick={() => editCartItem(cat.ID)}>Edit</Button>
+                                            <Button variant="danger" size="sm" onClick={() => editCartItem(cat.ID)}>Remove</Button>    
+                                        </td>
                                     </tr>
                                 ))}
                                 <tr className="text-end">
-                                    <td>{numberOfItems}</td>
-                                    <td contenteditable='true'></td>
-                                    <td contenteditable='true'></td>
-                                    <td contenteditable='true'></td>
-                                    <td contenteditable='true'></td>
-                                    <td contenteditable='true'></td>
-                                    <td contenteditable='true'></td>
-                                    <td contenteditable='true'></td>
-                                    <td colSpan="8"><Button variant="primary" className="float-right" onClick={() => addNewCartItem(item)}>Add New Product</Button></td>
+                                    <td id='newtitle' contenteditable='true'></td>
+                                    <td id='newdescription' contenteditable='true'></td>
+                                    <td id='newincludes' contenteditable='true'></td>
+                                    <td id='newintendedFor' contenteditable='true'></td>
+                                    <td id='newcoler' contenteditable='true'></td>
+                                    <td id='newmaterial' contenteditable='true'></td>
+                                    <td id='newprice' contenteditable='true'></td>
+                                    <td colSpan="8"><Button variant="success" className="float-right" onClick={() => addNewCartItem(numberOfItems)}>Add New Product</Button></td>
                                 </tr>
                             </thead>
                         </Table>
